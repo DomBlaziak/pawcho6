@@ -1,52 +1,38 @@
-Laboratorium 5 - Wieloetapowe budowanie obrazów
-Opis projektu
+# Projekt pawcho6 – Laboratorium 6 (Integracja z GitHub & BuildKit)
 
-Zadanie polegało na stworzeniu wydajnego i bezpiecznego obrazu Docker z wykorzystaniem techniki Multi-stage build. Pozwala to na całkowite oddzielenie ciężkiego środowiska budowy od minimalistycznego i bezpiecznego obrazu końcowego, co redukuje rozmiar obrazu i zwiększa bezpieczeństwo (brak zbędnych narzędzi w obrazie produkcyjnym).
-Struktura pliku Dockerfile:
+Niniejsze repozytorium służy jako **zdalne źródło zasobów** (Source of Truth) dla procesu budowy obrazu w ramach Laboratorium nr 6. Projekt opiera się na rozwiązaniu zadania z Laboratorium nr 5, rozszerzając je o zaawansowane mechanizmy chmurowe i nowoczesne standardy Docker.
 
-    Etap Builder: Wykorzystuje obraz Alpine do wygenerowania dynamicznego pliku index.html z danymi systemowymi kontenera 
-    (IP, Hostname, Wersja).
+### Kluczowe cechy Laboratorium 6:
+*   **BuildKit jako Standard:** Wykorzystano silnik BuildKit, który od wersji Docker Desktop 2.4.0.0 (oraz Docker Engine 23.0+) jest domyślnym i pierwszorzędnym standardem budowania obrazów, oferującym lepszą wydajność i obsługę sekretów.
+*   **Single Source of Truth:** Zasoby obrazu są pobierane dynamicznie z tego repozytorium podczas budowy, co uniezależnia proces od lokalnego systemu plików.
+*   **Bezpieczeństwo SSH Mount:** Wykorzystano funkcjonalność `--mount=type=ssh`. Pozwala ona na bezpieczne klonowanie repozytorium wewnątrz Dockerfile przy użyciu klucza prywatnego, który **nie zostaje skopiowany** do warstw obrazu.
+*   **Integracja GHCR:** Zbudowany obraz o tagu **lab6** jest publikowany w rejestrze **GitHub Container Registry** i trwale powiązany z niniejszym repozytorium (sekcja Packages).
+*   **Metadane OCI:** Zastosowano etykietę `org.opencontainers.image.source`, która automatycznie łączy artefakt w chmurze z kodem źródłowym w Git.
 
-    Etap Scratch: Służy jako minimalistyczny etap pośredni (izolator), na który kopiowany jest wyłącznie gotowy plik strony, 
-    co gwarantuje czystość artefaktów.
+---
 
-    Etap Final: Wykorzystuje serwer Nginx (wersja alpine). W tej wersji wprowadzono kluczowe usprawnienia:
+# Opis projektu (Laboratorium 5)
 
-        Metadane OCI: Zgodność ze standardami Open Container Initiative (autor, opisy).
+Zadanie polegało na stworzeniu wydajnego i bezpiecznego obrazu Docker z wykorzystaniem techniki **Multi-stage build**. Pozwala to na całkowite oddzielenie ciężkiego środowiska budowy od minimalistycznego obrazu końcowego.
 
-        Zarządzanie uprawnieniami: Pliki należą do użytkownika nginx, co jest zgodne z zasadą minimalnych uprawnień.
+### Struktura pliku Dockerfile:
 
-        ENTRYPOINT: Zdefiniowanie stałego procesu serwera, zapewniające stabilność kontenera.
+1.  **Etap Builder:** Wykorzystuje obraz Alpine do wygenerowania dynamicznego pliku `index.html` z danymi systemowymi kontenera (IP, Hostname, Wersja).
+2.  **Etap Scratch:** Służy jako minimalistyczny etap pośredni (izolator), na który kopiowany jest wyłącznie gotowy plik strony.
+3.  **Etap Final:** Wykorzystuje serwer **Nginx (wersja alpine)** z następującymi usprawnieniami:
+    *   **Metadane OCI:** Zgodność ze standardami Open Container Initiative.
+    *   **Zarządzanie uprawnieniami:** Pliki należą do użytkownika `nginx`.
+    *   **ENTRYPOINT:** Zdefiniowanie stałego procesu serwera.
+    *   **HEALTHCHECK:** Mechanizm monitorowania stanu zdrowia aplikacji (curl).
 
-        HEALTHCHECK: Skonfigurowany mechanizm monitorowania stanu zdrowia aplikacji.
+---
 
-Instrukcja uruchomienia projektu:
+### Instrukcja uruchomienia:
 
-Aby poprawnie zbudować i uruchomić aplikację, wykonaj poniższe kroki w terminalu (będąc w folderze projektu):
-1. Budowa obrazu:
+Aby poprawnie zbudować i uruchomić aplikację, wykonaj poniższe kroki:
 
-Podczas budowy należy przekazać numer wersji aplikacji za pomocą argumentu VERSION. Flaga -t nadaje obrazowi nazwę lab5-app:
+**1. Budowa obrazu (Metoda SSH):**
+Podczas budowy należy wskazać ścieżkę do swojego **klucza prywatnego** (zazwyczaj znajdującego się w katalogu `.ssh`), który posiada uprawnienia do Twojego konta GitHub:
 
-docker build --build-arg VERSION=1.5.0-stable -t lab5-app .
-
-2. Uruchomienie kontenera:
-
-Uruchamiamy serwer na porcie 8080 hosta w trybie odłączonym (-d):
-
-docker run -d -p 8080:80 --name lab5-srv lab5-app
-
-3. Weryfikacja działania:
-
-    Status Healthcheck: Odczekaj ok. 30 sekund i wpisz docker ps. W kolumnie STATUS powinno pojawić się oznaczenie (healthy).
-
-    Podgląd strony: Otwórz w przeglądarce adres: http://localhost:8080/.
-
-Wynik działania:
-
-Aplikacja wyświetla dynamicznie pobrane dane w estetycznej formie graficznej:
-
-    Adres IP serwera: Adres IP interfejsu sieciowego kontenera.
-
-    Nazwa serwera: Nazwa hosta kontenera (generowana w etapie builder).
-
-    Wersja aplikacji: Wartość przekazana dynamicznie w kroku budowy przez ARG.
+```bash
+docker build --ssh default=$HOME/.ssh/id_rsa -t lab6 .
