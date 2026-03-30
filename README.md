@@ -35,7 +35,7 @@ Aby poprawnie zbudować, uruchomić i zweryfikować kontener, wykonaj poniższe 
 **1. Budowa obrazu z wykorzystaniem klucza SSH:**
 Podczas budowy należy wskazać ścieżkę do swojego klucza prywatnego **Ed25519**, który posiada uprawnienia dostępu do Twojego konta GitHub:
 
-```bash
+``bash
 docker build --ssh default=$HOME/.ssh/id_ed25519 -t lab6 .
 
 **2. Uruchomienie kontenera:**
