@@ -33,10 +33,11 @@ Zadanie polegało na stworzeniu wydajnego i bezpiecznego obrazu Docker z wykorzy
 Aby poprawnie zbudować, uruchomić i zweryfikować kontener, wykonaj poniższe kroki w terminalu:
 
 **1. Budowa obrazu z wykorzystaniem klucza SSH:**
-Podczas budowy należy wskazać ścieżkę do swojego klucza prywatnego **Ed25519**, który posiada uprawnienia dostępu do Twojego konta GitHub:
+Podczas budowy należy wskazać ścieżkę do swojego klucza prywatnego **Ed25519**, który posiada uprawnienia dostępu do Twojego konta GitHub (dla mnie jest 
+to id_github_lab6):
 
 ```bash
-docker build --ssh default=$HOME/.ssh/id_ed25519 -t lab6 .
+docker build --ssh default=$HOME/.ssh/id_github_lab6 -t lab6 .
 ```
 **2. Uruchomienie kontenera:**
 Po pomyślnym zbudowaniu obrazu, uruchom serwer na porcie **8080** hosta w trybie odłączonym (`-d`):
