@@ -8,7 +8,7 @@ Projekt opiera się na rozwiązaniu zadania z Laboratorium nr 5, rozszerzając j
 *   **Single Source of Truth:** Zasoby obrazu są pobierane dynamicznie z tego repozytorium podczas budowy, co uniezależnia proces od lokalnego systemu plików i gwarantuje spójność kodu.
 *   **Bezpieczeństwo SSH Mount:** Wykorzystano funkcjonalność `--mount=type=ssh`. Pozwala ona na bezpieczne klonowanie repozytorium wewnątrz Dockerfile przy użyciu nowoczesnego klucza prywatnego **Ed25519**, który **nie zostaje skopiowany** do warstw obrazu.
 *   **Integracja GHCR:** Zbudowany obraz o tagu **lab6** jest publikowany w rejestrze **GitHub Container Registry** (ghcr.io) i trwale powiązany z niniejszym repozytorium (sekcja Packages).
-*   **Metadane OCI:** Zastosowano etykietę `org.opencontainers.image.source`, która automatycznie łączy artefakt w chmurze z kodem źródłowym w Git.
+*   **Metadane OCI:** Zastosowano etykietę `org.opencontainers.image.source`, która automatycznie łączy gotowy obraz w chmurze z kodem źródłowym w Git.
 
 ---
 
@@ -33,7 +33,7 @@ Zadanie polegało na stworzeniu wydajnego i bezpiecznego obrazu Docker z wykorzy
 Projekt został udostępniony jako gotowy obraz w rejestrze GitHub Container Registry (GHCR). Poniższa instrukcja pozwala na pobranie i uruchomienie usługi bezpośrednio z chmury, bez konieczności posiadania lokalnych plików źródłowych czy kluczy SSH.
 
 1. Pobranie obrazu z rejestru GHCR:
-Komenda zaciąga zbudowany artefakt lab6 bezpośrednio z serwerów GitHub:
+Komenda zaciąga zbudowany obraz lab6 bezpośrednio z serwerów GitHub:
 ```bash
 
 docker pull ghcr.io/domblaziak/lab6:latest
