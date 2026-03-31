@@ -28,20 +28,26 @@ Zadanie polegało na stworzeniu wydajnego i bezpiecznego obrazu Docker z wykorzy
 
 ---
 
-### Instrukcja obsługi projektu (Pełny cykl):
+### Instrukcja uruchomienia 
 
-Aby poprawnie zbudować, uruchomić i zweryfikować kontener, wykonaj poniższe kroki w terminalu:
+Projekt został udostępniony jako gotowy obraz w rejestrze GitHub Container Registry (GHCR). Poniższa instrukcja pozwala na pobranie i uruchomienie usługi bezpośrednio z chmury, bez konieczności posiadania lokalnych plików źródłowych czy kluczy SSH.
 
-**1. Budowa obrazu z wykorzystaniem klucza SSH:**
-Podczas budowy należy wskazać ścieżkę do swojego klucza prywatnego **Ed25519**, który posiada uprawnienia dostępu do Twojego konta GitHub (dla mnie jest 
-to id_github_lab6):
-
+1. Pobranie obrazu z rejestru GHCR:
+Komenda zaciąga zbudowany artefakt lab6 bezpośrednio z serwerów GitHub:
 ```bash
-docker build --ssh default=$HOME/.ssh/id_github_lab6 -t lab6 .
-```
-**2. Uruchomienie kontenera:**
-Po pomyślnym zbudowaniu obrazu, uruchom serwer na porcie **8080** hosta w trybie odłączonym (`-d`):
 
-```bash
-docker run -d -p 8080:80 --name lab6-srv lab6
+docker pull ghcr.io/domblaziak/lab6:latest
 ```
+2. Uruchomienie kontenera:
+Uruchomienie serwera na porcie 8080 hosta. Flaga -d uruchamia proces w tle, a --name nadaje unikalną nazwę instancji:
+```bash
+
+docker run -d -p 8080:80 --name lab6-srv ghcr.io/domblaziak/lab6:latest
+```
+3. Weryfikacja zawartości (Dowód integracji SSH):
+Aby potwierdzić, że obraz został poprawnie zbudowany z wykorzystaniem zasobów z repozytorium (mechanizm SSH Mount), można zweryfikować obecność plików projektu wewnątrz działającego kontenera:
+```bash
+
+docker exec -it lab6-srv ls -l /usr/share/nginx/html
+```
+Prawidłowy wynik powinien wskazywać na obecność plików Dockerfile oraz README.md pobranych z GitHuba w trakcie budowy obrazu.
